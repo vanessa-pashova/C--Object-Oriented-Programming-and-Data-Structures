@@ -88,7 +88,7 @@ int main() {
 
     mergeSort(nums, 0, size - 1);
 
-    std::cout << "Minimized sum of the pairs is: " << minimizedPairSum(nums, size) << '\n';
+    std::cout << "Minimized sum of the pairs is: " << minimizedPairSum(nums, size) << std::endl;
 
     delete [] nums;
     return 0;
