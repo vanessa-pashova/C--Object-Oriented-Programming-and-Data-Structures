@@ -2,20 +2,17 @@
 #include <cassert>
 
 void merge(int *arr, int low, int mid, int high) {
-    int n1 = mid - low + 1,
-        n2 = high - mid;
+    std::size_t n1 = mid - low + 1,
+                n2 = high - mid;
 
     assert(n1 > 0 && n2 > 0);
 
     int *left = nullptr,
         *right = nullptr;
-
     try {
         left = new int[n1];
         right = new int[n2];
-    }
-
-    catch(const std::bad_alloc&) {
+    } catch(const std::bad_alloc&) {
         std::cerr << "Memory allocation problem\n";
         delete [] left;
         delete [] right;
@@ -26,7 +23,7 @@ void merge(int *arr, int low, int mid, int high) {
         left[i] = arr[low + i];
 
     for(std::size_t i = 0; i < n2; ++i)
-        right[i] = arr[mid + i + 1];
+        right[i] = arr[mid + 1 + i];
 
     std::size_t i = 0, j = 0, k = low;
 
@@ -49,11 +46,8 @@ void merge(int *arr, int low, int mid, int high) {
 }
 
 void mergeSort(int *arr, int low, int high) {
-//    assert(low >= 0 && high >= 0);
-
     if(low < high) {
         int mid = low + (high - low) / 2;
-        assert(low <= mid && mid < high);
 
         mergeSort(arr, low, mid);
         mergeSort(arr, mid + 1, high);
@@ -62,42 +56,40 @@ void mergeSort(int *arr, int low, int high) {
     }
 }
 
-int minDiff(int *arr, std::size_t size, int k) {
-    if(k == 1)
-        return 0;
+int minimizedPairSum(int *&arr, std::size_t &size) {
+    int maxSum = 0;
 
-    mergeSort(arr, 0, size - 1);
-
-    int minDiff = arr[k - 1] - arr[0];
-
-    for(std::size_t i = 1; i <= size - k; ++i) {
-        int diff = arr[k + i - 1] - arr[i];
-        minDiff = std::min(minDiff, diff);
+    for(std::size_t i = 0; i < size / 2; ++i) {
+        int currentSum = arr[i] + arr[size - 1 - i];
+        maxSum = std::max(maxSum, currentSum);
     }
 
-    return minDiff;
+    return maxSum;
 }
 
 int main() {
-    std::size_t size = 0, k = 0;
-    std::cout << "Insert the number of the students: ";
+    std::size_t size = 0;
+    std::cout << "Insert a size for the array: ";
     std::cin >> size;
-    std::cout << "Insert a value for k: ";
-    std::cin >> k;
 
-    assert(size > 0 && k > 0);
+    assert(size % 2 == 0);
 
-    int *nums = new(std::nothrow) int[size];
-    if(!nums) {
+    int *nums = nullptr;
+    try {
+        nums = new int[size];
+    } catch(const std::bad_alloc&) {
         std::cerr << "Memory allocation problem\n";
         return 1;
     }
 
-    std::cout << "Insert the values of the array:\n";
+    std::cout << "Insert values for the array:\n";
     for(std::size_t i = 0; i < size; ++i)
         std::cin >> nums[i];
 
-    std::cout << "Minimal difference: " << minDiff(nums, size, k) << '\n';
+    mergeSort(nums, 0, size - 1);
+
+    std::cout << "Minimized sum of the pairs is: " << minimizedPairSum(nums, size) << '\n';
 
     delete [] nums;
+    return 0;
 }
