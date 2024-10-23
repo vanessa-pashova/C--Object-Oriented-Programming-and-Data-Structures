@@ -30,6 +30,7 @@ int partition(int **arr, int low, int high, std::size_t k) {
 void quickSort(int **arr, int low, int high, std::size_t k) {
     if (low < high) {
         int pi = partition(arr, low, high, k);
+
         quickSort(arr, low, pi - 1, k);
         quickSort(arr, pi + 1, high, k);
     }
