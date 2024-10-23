@@ -23,7 +23,7 @@ int main() {
     std::cout << "Insert n: ";
     std::cin >> n;
 
-    assert(n > 2);
+//    assert(n > 2);
 
     try {
         int *nums = new int[n];
