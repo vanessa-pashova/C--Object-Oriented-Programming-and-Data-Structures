@@ -51,7 +51,7 @@ int main() {
 
     quickSort(piles, 0, arraySize - 1);
 
-    std::cout << "Maximum I can get is: " << total(piles, arraySize) << '\n';
+    std::cout << "Maximum I can get is: " << total(piles, arraySize) << std::endl;
 
     delete[] piles;
     return 0;
