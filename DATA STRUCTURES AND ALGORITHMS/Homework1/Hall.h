@@ -13,25 +13,36 @@ private:
     std::vector<Seat*> matrixOfSeats; //can be just a vector and every new row starts on every mod column index
     std::vector<Seat*> brokenSeats;
 
+    void clearSeats(std::vector<Seat*> &seats) {
+        for (Seat* seat : seats) {
+            delete seat;
+        }
+        seats.clear();
+    }
+
 public:
     Hall(unsigned int row, unsigned int column);
+    ~Hall();
 
     Hall() = delete;
     Hall(const Hall &other) = delete;
     Hall &operator=(const Hall &other) = delete;
-    ~Hall();
 
     unsigned int getRowsInHall() const;
     unsigned int getColumnsInHall() const;
     unsigned int getBrokenSeatsCount() const;
-    const std::vector<Seat*>& getBrokenSeats() const;
+    const std::vector<Seat*> &getBrokenSeats() const;
+    const std::vector<Seat*> &getMatrixOfSeats() const;
 
     void setBrokenSeatsCount(unsigned int brokenSeatsCnt);
 
-    void insertValuesForRowAndCols();
-    void defineBrokenSeats();
-    void generateAvailableSeats();
-//    void orderStudents();
+    void insertValuesForRowAndCols(unsigned int row, unsigned int column);
+    void defineBrokenSeats(std::vector<unsigned int> brokenSeatsIndexes);
+    void generateAvailableSeats(std::vector<unsigned int> brokenSeatsIndexes);
+
+    void printLayoutOfHall() const;
+    bool assignSeatToStudent(unsigned int studentID);
+    void releaseSeats(unsigned int currentTime);
 };
 
 

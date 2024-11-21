@@ -3,113 +3,84 @@
 #include <string>
 #include <cassert>
 
-Student::Student(const std::string &firstName, const std::string &familyName, const std::string &arriveTime, const std::string &departureTime, short grade)
-        : arriveTime(Time::fromString(arriveTime)), departureTime(Time::fromString(departureTime)) {
-    this->setFirstName(firstName);
-    this->setFamilyName(familyName);
-    this->setArriveTime(this->arriveTime, this->departureTime);
-    increaseID();
-    this->setGrade(grade);
+const unsigned int MIN_DURATION = 15;
+const unsigned int MAX_DURATION = 120;
+
+Student::Student(unsigned int arrivalTime, unsigned int id, unsigned int duration, unsigned int course) {
+    this->arrivalTime = arrivalTime;
+    this->setID(id);
+    this->setDuration(duration);
+    this->setCourse(course);
 }
 
-const std::string Student::getFirstName() const {
-    return this->firstName;
+Student::~Student() {
+    if (this->seat != nullptr) {
+        delete seat;
+        seat = nullptr;
+    }
 }
 
-const std::string Student::getFamilyName() const {
-    return this->familyName;
+unsigned int Student::getArrivalTime() const {
+    return this->arrivalTime;
 }
 
-const std::string Student::getCourse() const {
-    return this->course;
+unsigned int Student::getID() const {
+    return this->id;
 }
 
-const int Student::getID() {
-    return id;
-}
-
-bool Student::getHasSeat() const {
-    return this->getHasSeat();
-}
-
-short Student::getGrade() const {
-    return this->grade;
-}
-
-short Student::getDuration() const {
+unsigned int Student::getDuration() const {
     return this->duration;
 }
 
-void Student::setFirstName(const std::string &name) {
-    this->firstName = correctName(name);
+unsigned int Student::getCourse() const {
+    return this->course;
 }
 
-void Student::setFamilyName(const std::string &name) {
-    this->familyName = correctName(name);
+bool Student::getHasSeat() const {
+    return this->hasSeat;
 }
 
-void Student::setArriveTime(Time arriveTime, Time departureTime) {
-    if (this->arriveTime.getHour() > this->departureTime.getHour())
-        throw std::invalid_argument("Invalid arrival time given.");
+void Student::setID(unsigned int id) {
+    if(1 <= id && id <= 256)
+        this->id = id;
+
+    else
+        throw std::invalid_argument("Invalid studentID given.");
+}
+
+void Student::setDuration(unsigned int duration) {
+    if(MAX_DURATION < duration)
+        throw std::logic_error("Student puts too much effort.");
+
+    else if(duration < MIN_DURATION)
+        throw std::logic_error("Student does not give... this exam a shot.");
+
+    else
+        this->duration = duration;
+}
+
+void Student::setCourse(unsigned int course) {
+    if (2 <= course && course <= 4)
+        this->course = course;
+
+    else
+        throw std::logic_error("Invalid course given.");
 }
 
 void Student::setHasSeat(bool flag) {
     this->hasSeat = flag;
 }
 
-void Student::setGrade(short grade) {
-    assert(2 <= grade && grade <= 4);
-    this->grade = grade;
-}
+void Student::occupySeat(Seat *seat) {
+    if(!seat->getBroken() || !seat->getOccupied()) {
+        this->seat = seat;
+        this->setHasSeat(true);
+    }
 
-void Student::setDuration(short duration) {
-    assert(duration <= 120); //2 hours in minutes
-    this->duration = duration;
+    else
+        throw std::invalid_argument("This seat is broken or taken.");
 }
 
 void Student::printInformation() const {
-    std::cout << "------- INFORMATION FOR STUDENT: " << id << " -------\n";
-    std::cout << "Names: " << this->firstName << ' ' << this->familyName << '\n';
-    std::cout << "Course: " << this->course << ", grade: " << this->grade << '\n';
-
-    std::cout << "Arrival time: ";
-    this->arriveTime.printTime();
-    std::cout << "Departure time: ";
-    this->departureTime.printTime();
-    std::cout << '\n';
-
-    std::cout << "Has seat: " << (this->hasSeat ? "yes" : "no") << " ";
-    if(this->hasSeat)
-        seat.printSeat();
-
-    std::cout << "Needed time in minutes for the exam: " << this->duration << '\n';
-    std::cout << '\n';
-}
-
-//void Student::occupySeat()  {
-//    Seat seat;
-//
-//    try {
-//        seat.setSeat();
-//        this->setHasSeat(true);
-//        seat.setIfOccupied(true);
-//    } catch (std::runtime_error &e) {
-//        std::cerr << "Error while setting a seat for student: " << this->getID() << '\n';
-//        e.what();
-//    }
-//}
-
-int main() {
-    try {
-        Student student1("Ivan", "Ivanov", "08:30", "17:00", 2);
-        student1.printInformation();
-//        student1.occupySeat();
-//
-////        Student student2 = student1;
-//
-    } catch (const std::exception &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-    return 0;
+    std::cout << this->id << '\n';
 }

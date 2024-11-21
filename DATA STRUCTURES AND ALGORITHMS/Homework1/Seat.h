@@ -5,25 +5,29 @@
 class Seat {
 private:
     bool broken, occupied;
-    unsigned int row, column;
+    unsigned int index;
+    unsigned int occupiedUntilTime;
 
 public:
-    Seat(unsigned int row, unsigned int column, bool broken, bool occupied);
-    Seat() = default;
-    Seat(const Seat &other) = delete;
-    Seat &operator=(const Seat &other) = delete;
-    bool &operator==(const Seat &other) const;
+    Seat(unsigned int index, bool broken, bool occupied);
+    Seat();
+
+    Seat(const Seat &other);
+    Seat &operator=(const Seat &other);
+
+    bool operator==(const Seat &other) const;
     ~Seat() = default;
 
     bool getBroken() const;
     bool getOccupied() const;
-    unsigned int getRow() const;
-    unsigned int getColumn() const;
+    unsigned int getIndex() const;
+    char getSign() const;
+    unsigned int getOccupiedUntilTime() const;
 
     void setIfBroken(bool flag);
     void setIfOccupied(bool flag);
-    void setRow(unsigned int row);
-    void setColumn(unsigned int column);
+    void setIndex(unsigned int index);
+    void setOccupiedUntilTime(unsigned int time);
 
     void printSeat() const;
 };

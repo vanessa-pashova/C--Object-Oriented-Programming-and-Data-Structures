@@ -1,16 +1,29 @@
 #include "Seat.h"
 
-Seat::Seat(unsigned int row, unsigned int column, bool broken, bool occupied) {
-    this->setRow(row);
-    this->setColumn(column);
+Seat::Seat(unsigned int index, bool broken, bool occupied) : occupiedUntilTime(0) {
+    this->setIndex(index);
     this->setIfBroken(broken);
     this->setIfOccupied(occupied);
 }
 
-bool &Seat::operator==(const Seat &other) const {
+Seat::Seat() : index(0), broken(false), occupied(false), occupiedUntilTime(0) {}
+
+Seat &Seat::operator=(const Seat &other) {
+    if(this != &other) {
+        this->index = other.index;
+        this->broken = other.broken;
+        this->occupied = other.occupied;
+        this->occupiedUntilTime = other.occupiedUntilTime;
+    }
+
+    return *this;
+}
+
+bool Seat::operator==(const Seat &other) const {
     bool flag = false;
 
-    if(this->row == other.row && this->column == other.column)
+    if(this->index == other.index && this->occupied == other.occupied
+    && this->broken == other.broken && this->occupiedUntilTime == other.occupiedUntilTime)
         flag = true;
 
     return flag;
@@ -24,12 +37,22 @@ bool Seat::getOccupied() const {
     return this->occupied;
 }
 
-unsigned int Seat::getRow() const {
-    return this->row;
+unsigned int Seat::getIndex() const {
+    return this->index;
 }
 
-unsigned int Seat::getColumn() const {
-    return this->column;
+char Seat::getSign() const {
+    if(this->broken)
+        return 'B';
+
+    if(this->occupied)
+        return 'O';
+
+    return 'F';
+}
+
+unsigned int Seat::getOccupiedUntilTime() const {
+    return this->occupiedUntilTime;
 }
 
 void Seat::setIfBroken(bool flag) {
@@ -40,22 +63,18 @@ void Seat::setIfOccupied(bool flag) {
     this->occupied = flag;
 }
 
-void Seat::setRow(unsigned int row) {
-    if(1 <= row && row <= 6)
-        this->row = row;
+void Seat::setIndex(unsigned int index) {
+    if(0 <= index && index <= 256)
+        this->index = index;
 
     else
-        throw std::invalid_argument("Invalid number of the row.");
+        throw std::invalid_argument("Index out of bound given.");
 }
 
-void Seat::setColumn(unsigned int column) {
-    if(1 <= column && column <= 7)
-        this->column = column;
-
-    else
-        throw std::invalid_argument("Invalid number of column.");
+void Seat::setOccupiedUntilTime(unsigned int time) {
+    this->occupiedUntilTime = time;
 }
 
 void Seat::printSeat() const {
-    std::cout << "R: " << this->row << ", C: " << this->column << '\n';
+    std::cout << "Index of the seat: " << this->index << '\n';
 }

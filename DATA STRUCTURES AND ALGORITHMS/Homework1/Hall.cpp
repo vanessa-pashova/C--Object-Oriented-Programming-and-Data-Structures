@@ -1,18 +1,13 @@
 #include "Hall.h"
 #include <cassert>
 
+Hall::Hall(unsigned int row, unsigned int column)
+        : row(row), column(column), brokenSeatsCount(0) {}
+
 Hall::~Hall() {
-    for (Seat* seat : brokenSeats)
-        delete seat;
-
-    brokenSeats.clear();
-
-    for (Seat* seat : matrixOfSeats)
-        delete seat;
-
-    matrixOfSeats.clear();
+    clearSeats(matrixOfSeats);
+    clearSeats(brokenSeats);
 }
-
 
 unsigned int Hall::getRowsInHall() const {
     return this->row;
@@ -26,81 +21,109 @@ unsigned int Hall::getBrokenSeatsCount() const {
     return this->brokenSeatsCount;
 }
 
-const std::vector<Seat*>& Hall::getBrokenSeats() const {
+const std::vector<Seat*> &Hall::getBrokenSeats() const {
     return this->brokenSeats;
 }
 
+const std::vector<Seat*> &Hall::getMatrixOfSeats() const {
+    return this->matrixOfSeats;
+}
+
 void Hall::setBrokenSeatsCount(unsigned int brokenSeatsCnt) {
-    if(this->row * this->column < brokenSeatsCnt)
+    if((this->row * this->column) < brokenSeatsCnt)
         throw std::invalid_argument("Invalid number of broken seats: much more than the Hall capacity.");
 
     else
         this->brokenSeatsCount = brokenSeatsCnt;
 }
 
-void Hall::insertValuesForRowAndCols() {
-    unsigned int rows = 0, columns = 0;
-    std::cout << "> Insert the number of the rows: ";
-    std::cin >> rows;
-    std::cout << "> Insert the number of the columns: ";
-    std::cin >> columns;
-
+void Hall::insertValuesForRowAndCols(unsigned int rows, unsigned int columns) {
     this->row = rows;
     this->column = columns;
 }
 
-void Hall::defineBrokenSeats() {
-    unsigned int brokenSeatsCnt;
-    std::cout << "> Insert the number of the broken seats: ";
-    std::cin >> brokenSeatsCnt;
+//must receive a vector with the indexes of the broken chairs, create obj of Seat type and initialize them
+void Hall::defineBrokenSeats(std::vector<unsigned int> brokenSeatsIndexes) {
+    for (unsigned int index : brokenSeatsIndexes) {
+        if (index >= row * column)
+            throw std::invalid_argument("Invalid seat index.");
 
-    this->setBrokenSeatsCount(brokenSeatsCnt);
-    this->brokenSeats.resize(this->brokenSeatsCount);
+        Seat* seat = new Seat(index, true, false);
+        brokenSeats.push_back(seat);
+    }
+}
 
-    std::cout << "-------- Broken Seats Insertion --------\n";
-    for(Seat *seat : brokenSeats) {
-        unsigned int row = 0, col = 0;
+//receives a vector with the broken seats indexes, creates a seat with the current index and if its equal to some seat from brokenSeatsIndexes
+//‼️ CHANGED ‼️
+void Hall::generateAvailableSeats(std::vector<unsigned int> brokenSeatsIndexes) {
+    defineBrokenSeats(brokenSeatsIndexes); // Определяме счупените седалки
 
-        std::cout << "> Insert the number of the row: ";
-        std::cin >> row;
-        assert(row < this->row);
-        std::cout << "> Insert the number of the column: ";
-        std::cin >> col;
-        assert(col < this->column);
+    for (unsigned int i = 0; i < row; i++) {
+        for (unsigned int j = 0; j < column; j++) {
+            unsigned int index = i * column + j;
 
-        seat->setRow(row);
-        seat->setColumn(col);
-        seat->setIfBroken(true);
-        seat->setIfOccupied(false);
+            // Пропускаме счупените седалки
+            bool isBroken = false;
+            for (Seat* brokenSeat : brokenSeats) {
+                if (brokenSeat->getIndex() == index) {
+                    isBroken = true;
+                    break;
+                }
+            }
+            if (isBroken) continue;
+
+            // Запазваме свободни седалки на "през ред и място"
+            if ((i % 2 == 0) && (j % 2 == 0)) {
+                Seat* seat = new Seat(index, false, false);
+                matrixOfSeats.push_back(seat);
+            }
+        }
+    }
+}
+
+void Hall::printLayoutOfHall() const {
+    std::cout << "------- HALL LAYOUT -------\n";
+    for (unsigned int i = 0; i < row; i++) {
+        for (unsigned int j = 0; j < column; j++) {
+            unsigned int index = i * column + j;
+            char sign = 'F'; //by default
+
+            for (Seat* brokenSeat : brokenSeats) {
+                if (brokenSeat->getIndex() == index) {
+                    sign = 'B';
+                    break;
+                }
+            }
+
+            for (Seat* seat : matrixOfSeats) {
+                if (seat->getIndex() == index && seat->getOccupied()) {
+                    sign = 'O';
+                    break;
+                }
+            }
+
+            std::cout << sign;
+        }
 
         std::cout << '\n';
     }
 }
 
-//must add the queue with students so we know who where sits and till when
-//because we need to know which seat is free then
-void Hall::generateAvailableSeats() {
-    std::cout << "-------- Seats Insertion --------\n";
+bool Hall::assignSeatToStudent(unsigned int studentID) {
+    for (Seat* seat : matrixOfSeats) {
+        if (!seat->getOccupied()) { // ✨ Намираме първата свободна седалка
+            seat->setIfOccupied(true);
+            return true; // Успешно зададена седалка
+        }
+    }
+    return false; // Няма свободна седалка
+}
 
-    for (std::size_t i = 0; i < this->row; i++) {
-        for (std::size_t j = 0; j < this->column; j++) {
-            if ((i % 2 != 0) && (j % 2 != 0)) {
-                Seat *seat = new Seat(static_cast<unsigned int>(i + 1), static_cast<unsigned int>(j + 1), false, true);
-
-                bool isBroken = false;
-                for (Seat *brokenSeat : brokenSeats) {
-                    if (*brokenSeat == *seat) {
-                        isBroken = true;
-                        break;
-                    }
-                }
-
-                if (!isBroken)
-                    this->matrixOfSeats.emplace_back(seat);
-
-                else
-                    delete seat;
-            }
+void Hall::releaseSeats(unsigned int currentTime) {
+    for (Seat* seat : matrixOfSeats) {
+        if (seat->getOccupied() && seat->getOccupiedUntilTime() <= currentTime) {
+            seat->setIfOccupied(false); // Освобождаваме седалката
+            std::cout << "Seat at index " << seat->getIndex() << " is now free.\n";
         }
     }
 }
