@@ -10,7 +10,7 @@
 class Hall {
 private:
     unsigned int row, column, brokenSeatsCount;
-    std::vector<Seat*> matrixOfSeats; //can be just a vector and every new row starts on every mod column index
+    std::vector<Seat*> matrixOfSeats;
     std::vector<Seat*> brokenSeats;
 
     void clearSeats(std::vector<Seat*> &seats) {
@@ -41,7 +41,7 @@ public:
     void generateAvailableSeats(std::vector<unsigned int> brokenSeatsIndexes);
 
     void printLayoutOfHall() const;
-    bool assignSeatToStudent(unsigned int studentID);
+    bool assignSeatToStudent(unsigned int studentID, unsigned int arrivalTime, unsigned int duration);
     void releaseSeats(unsigned int currentTime);
 };
 

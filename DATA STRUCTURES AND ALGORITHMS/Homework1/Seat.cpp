@@ -23,7 +23,7 @@ bool Seat::operator==(const Seat &other) const {
     bool flag = false;
 
     if(this->index == other.index && this->occupied == other.occupied
-    && this->broken == other.broken && this->occupiedUntilTime == other.occupiedUntilTime)
+       && this->broken == other.broken && this->occupiedUntilTime == other.occupiedUntilTime)
         flag = true;
 
     return flag;

@@ -53,16 +53,13 @@ void Hall::defineBrokenSeats(std::vector<unsigned int> brokenSeatsIndexes) {
     }
 }
 
-//receives a vector with the broken seats indexes, creates a seat with the current index and if its equal to some seat from brokenSeatsIndexes
-//‼️ CHANGED ‼️
 void Hall::generateAvailableSeats(std::vector<unsigned int> brokenSeatsIndexes) {
-    defineBrokenSeats(brokenSeatsIndexes); // Определяме счупените седалки
+    defineBrokenSeats(brokenSeatsIndexes);
 
     for (unsigned int i = 0; i < row; i++) {
         for (unsigned int j = 0; j < column; j++) {
             unsigned int index = i * column + j;
 
-            // Пропускаме счупените седалки
             bool isBroken = false;
             for (Seat* brokenSeat : brokenSeats) {
                 if (brokenSeat->getIndex() == index) {
@@ -70,9 +67,10 @@ void Hall::generateAvailableSeats(std::vector<unsigned int> brokenSeatsIndexes) 
                     break;
                 }
             }
-            if (isBroken) continue;
 
-            // Запазваме свободни седалки на "през ред и място"
+            if (isBroken)
+                continue;
+
             if ((i % 2 == 0) && (j % 2 == 0)) {
                 Seat* seat = new Seat(index, false, false);
                 matrixOfSeats.push_back(seat);
@@ -109,21 +107,24 @@ void Hall::printLayoutOfHall() const {
     }
 }
 
-bool Hall::assignSeatToStudent(unsigned int studentID) {
+bool Hall::assignSeatToStudent(unsigned int studentID, unsigned int arrivalTime, unsigned int duration) {
     for (Seat* seat : matrixOfSeats) {
-        if (!seat->getOccupied()) { // ✨ Намираме първата свободна седалка
+        if (!seat->getOccupied() || seat->getOccupiedUntilTime() <= arrivalTime) {
             seat->setIfOccupied(true);
-            return true; // Успешно зададена седалка
+            seat->setOccupiedUntilTime(arrivalTime + duration);
+            std::cout << "Student " << studentID << " assigned to seat " << seat->getIndex() << " until time " << arrivalTime + duration << ".\n";
+            return true;
         }
     }
-    return false; // Няма свободна седалка
+
+    return false;
 }
 
 void Hall::releaseSeats(unsigned int currentTime) {
     for (Seat* seat : matrixOfSeats) {
         if (seat->getOccupied() && seat->getOccupiedUntilTime() <= currentTime) {
-            seat->setIfOccupied(false); // Освобождаваме седалката
-            std::cout << "Seat at index " << seat->getIndex() << " is now free.\n";
+            seat->setIfOccupied(false);
+            std::cout << "Seat at index " << seat->getIndex() << " is now free at time " << currentTime << ".\n";
         }
     }
 }

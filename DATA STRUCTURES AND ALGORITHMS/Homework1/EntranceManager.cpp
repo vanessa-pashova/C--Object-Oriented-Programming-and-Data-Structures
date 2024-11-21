@@ -19,18 +19,24 @@ EntranceManager::~EntranceManager() {
 }
 
 void EntranceManager::execution() {
-    while(!this->queue.empty()) {
-        Student *student = this->queue.top();
-        this->queue.pop();
+    unsigned int currentTime = 0;
 
-        if(hall->assignSeatToStudent(student->getID()))
-            this->studentsWhoHasFinished.push_back(student);
+    while (!queue.empty()) {
+        Student* student = queue.top();
 
-        //✨ not sure if this works properly
-        else {
-            std::cerr << "No available seat for student: " << student->getID() << '\n';
-            delete student;
-        }
+        if (student->getArrivalTime() > currentTime)
+            currentTime = student->getArrivalTime();
+
+        queue.pop();
+
+        if (hall->assignSeatToStudent(student->getID(), student->getArrivalTime(), student->getDuration()))
+            studentsWhoHasFinished.push_back(student);
+
+        else
+            queue.push(student);
+
+        hall->releaseSeats(currentTime);
+        currentTime++;
     }
 }
 
