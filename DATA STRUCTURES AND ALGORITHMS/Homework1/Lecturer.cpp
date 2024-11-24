@@ -26,18 +26,18 @@ const std::stack<unsigned int> &Lecturer::getCheckedWorks() const {
 }
 
 void Lecturer::setArriveTime(unsigned int time) {
-    if(ARRIVAL_TIME < time)
-        throw std::logic_error("Lecturer comes too late, next time better calculate his time, pls.");
-
-    else
+//    if(ARRIVAL_TIME < time)
+//        throw std::logic_error("Lecturer comes too late, next time better calculate his time, pls.");
+//
+//    else
         this->arriveTime = time;
 }
 
 void Lecturer::setCheckTime(unsigned int time) {
-    if(CHECK_TIME < time)
-        throw std::logic_error("Takes too long for the lecturer to check a work.");
-
-    else
+//    if(CHECK_TIME < time)
+//        throw std::logic_error("Takes too long for the lecturer to check a work.");
+//
+//    else
         this->checkTime = time;
 }
 
@@ -54,12 +54,14 @@ void Lecturer::checkWorks(unsigned int &currentTime) {
         unsigned int currentWork = this->studentsWorks.top();
         studentsWorks.pop();
         this->checkedWorks.push(currentWork);
+
         currentTime += this->checkTime;
     }
 }
 
 void Lecturer::printCheckedWorks() {
     std::cout << "------ PRINT CHECKED WORKS ------\n";
+
     while(!this->checkedWorks.empty()) {
         std::cout << this->checkedWorks.top() << '\n';
         this->checkedWorks.pop();

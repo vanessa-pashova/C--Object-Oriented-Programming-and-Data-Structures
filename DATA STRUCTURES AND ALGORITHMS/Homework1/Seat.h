@@ -5,11 +5,10 @@
 class Seat {
 private:
     bool broken, occupied;
-    unsigned int index;
-    unsigned int occupiedUntilTime;
+    unsigned int index, occupiedUntilTime;
 
 public:
-    Seat(unsigned int index, bool broken, bool occupied);
+    Seat(unsigned int index, bool broken, bool occupied, unsigned int occupiedUntilTime);
     Seat();
 
     Seat(const Seat &other);
@@ -27,7 +26,7 @@ public:
     void setIfBroken(bool flag);
     void setIfOccupied(bool flag);
     void setIndex(unsigned int index);
-    void setOccupiedUntilTime(unsigned int time);
+    void setOccupiedUntilTime(unsigned int occupiedUntilTime);
 
     void printSeat() const;
 };

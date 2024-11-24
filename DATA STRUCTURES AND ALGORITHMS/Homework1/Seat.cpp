@@ -1,9 +1,10 @@
 #include "Seat.h"
 
-Seat::Seat(unsigned int index, bool broken, bool occupied) : occupiedUntilTime(0) {
+Seat::Seat(unsigned int index, bool broken, bool occupied, unsigned int occupiedUntilTime)  {
     this->setIndex(index);
     this->setIfBroken(broken);
     this->setIfOccupied(occupied);
+    this->setOccupiedUntilTime(occupiedUntilTime);
 }
 
 Seat::Seat() : index(0), broken(false), occupied(false), occupiedUntilTime(0) {}
@@ -23,7 +24,7 @@ bool Seat::operator==(const Seat &other) const {
     bool flag = false;
 
     if(this->index == other.index && this->occupied == other.occupied
-       && this->broken == other.broken && this->occupiedUntilTime == other.occupiedUntilTime)
+        && this->broken == other.broken && this->occupiedUntilTime == other.occupiedUntilTime)
         flag = true;
 
     return flag;
@@ -61,6 +62,9 @@ void Seat::setIfBroken(bool flag) {
 
 void Seat::setIfOccupied(bool flag) {
     this->occupied = flag;
+
+    if(this->occupied == false)
+        this->occupiedUntilTime = 0;
 }
 
 void Seat::setIndex(unsigned int index) {
@@ -71,8 +75,8 @@ void Seat::setIndex(unsigned int index) {
         throw std::invalid_argument("Index out of bound given.");
 }
 
-void Seat::setOccupiedUntilTime(unsigned int time) {
-    this->occupiedUntilTime = time;
+void Seat::setOccupiedUntilTime(unsigned int occupiedUntilTime) {
+    this->occupiedUntilTime = occupiedUntilTime;
 }
 
 void Seat::printSeat() const {

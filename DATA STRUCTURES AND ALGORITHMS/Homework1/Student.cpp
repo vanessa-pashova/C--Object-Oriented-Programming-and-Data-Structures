@@ -36,8 +36,16 @@ unsigned int Student::getCourse() const {
     return this->course;
 }
 
+unsigned int Student::getFinishTime() const {
+    return this->finishTime;
+}
+
 bool Student::getHasSeat() const {
     return this->hasSeat;
+}
+
+Seat *Student::getSeat() const {
+    return this->seat;
 }
 
 void Student::setID(unsigned int id) {
@@ -71,14 +79,27 @@ void Student::setHasSeat(bool flag) {
     this->hasSeat = flag;
 }
 
+void Student::calculateFinishTime() {
+    this->finishTime = this->arrivalTime + this->duration;
+}
+
 void Student::occupySeat(Seat *seat) {
     if(!seat->getBroken() || !seat->getOccupied()) {
         this->seat = seat;
         this->setHasSeat(true);
+
+        seat->setIfOccupied(true);
+        seat->setOccupiedUntilTime(this->duration);
     }
 
     else
         throw std::invalid_argument("This seat is broken or taken.");
+}
+
+void Student::realeaseSeat(Seat *seat) {
+    this->setHasSeat(false);
+
+    seat->setIfOccupied(false);
 }
 
 void Student::printInformation() const {
