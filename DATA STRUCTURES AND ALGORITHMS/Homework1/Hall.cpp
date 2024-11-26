@@ -97,7 +97,7 @@ bool Hall::assignSeatToStudent(unsigned int studentID, unsigned int arrivalTime,
             unsigned int releaseTime = arrivalTime + duration;
             seat->setOccupiedUntilTime(releaseTime);
 
-//            std::cout << "Student " << studentID << " assigned to seat " << seat->getIndex() << " until time " << formatTime(releaseTime) << ".\n";
+            std::cout << "Student " << studentID << " assigned to seat " << seat->getIndex() << " until time " << formatTime(releaseTime) << ".\n";
             return true;
         }
     }
